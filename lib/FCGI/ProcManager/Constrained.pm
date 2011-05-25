@@ -38,7 +38,7 @@ sub pm_post_dispatch {
         and $self->{_request_counter} # Not the first request
         and $self->{_request_counter} % $self->sizecheck_num_requests == 0
     ) {
-        $self->exit("safe exit due to memory limits exceeded after " . $self->{_request_counter} . " requests")
+        $self->pm_exit("safe exit due to memory limits exceeded (".$self->_check_size." Bytes) after " . $self->{_request_counter} . " requests")
             if $self->_limits_are_exceeded;
     }
     $self->SUPER::pm_post_dispatch();
@@ -70,7 +70,7 @@ sub _check_size {
 
 sub _load {
     my $mod = shift;
-    eval { require($mod); 1; }
+    eval " require $mod; 1; "
 }
 our $USE_SMAPS;
 BEGIN {
